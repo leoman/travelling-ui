@@ -10,7 +10,7 @@ const ScrollProgress: React.FC = (): React.ReactElement => {
   const handleScroll = () => {
     try {
       const winHeight = window.innerHeight
-      const docRect: any = document.body.getBoundingClientRect()
+      const docRect: DOMRect = document.body.getBoundingClientRect()
       const docHeight = docRect.height
   
       const max = docHeight - winHeight

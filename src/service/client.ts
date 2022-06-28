@@ -37,6 +37,7 @@ class HTTPClient {
       
       const parsedResponse = await response.json();
       return parsedResponse;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.status === 401) {
         localStorage.removeItem('token')

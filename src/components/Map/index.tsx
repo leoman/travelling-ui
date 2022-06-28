@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FunctionComponent, useState, useEffect } from 'react'
 import { MapI, MapMarkerI } from '../../types'
 import { Post } from '../../types/post'
@@ -94,7 +95,7 @@ const Marker: React.FC<MarkerProps> = ({ post, lat, lng, hovered, ...options }) 
 
 interface MapProps extends google.maps.MapOptions {
   children?: React.ReactNode
-  bounds: any
+  bounds: google.maps.LatLngBounds
   posts: Post[]
   style: { [key: string]: string }
 }

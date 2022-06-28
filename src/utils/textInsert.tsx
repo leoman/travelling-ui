@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Ref { 
   value: string
   selectionStart: number
@@ -71,6 +72,7 @@ const toolbar = {
   },
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default ($ref: any, type: string | number) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

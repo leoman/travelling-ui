@@ -6,6 +6,7 @@ interface Props {
   light?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ScrollTop = forwardRef(({ light = false }: Props, ref: any): React.ReactElement | null => {
 
   const [shown, setShown] = useState<boolean>(false)

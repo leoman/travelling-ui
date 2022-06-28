@@ -15,6 +15,7 @@ interface Props {
 const PostContent: React.FC<Props> = ({ content, photos, title, slug }: Props): React.ReactElement => {
 
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const contentRef: any = React.createRef()
 
   const [photoIndex, setPhotoIndex] = useState<number>(0)
@@ -36,6 +37,7 @@ const PostContent: React.FC<Props> = ({ content, photos, title, slug }: Props): 
   }, [setLightBoxImages])
 
   const checkTargetClick = (e: React.MouseEvent<HTMLElement>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const element: any = e.target
     const dataId = element.getAttribute('data-image-id')
     if (dataId) {
@@ -49,7 +51,7 @@ const PostContent: React.FC<Props> = ({ content, photos, title, slug }: Props): 
     setPhotoIndex(index)
   }
 
-  const goHome = (event: any) => {
+  const goHome = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     navigate(`/${slug}`, { replace: false });
   }

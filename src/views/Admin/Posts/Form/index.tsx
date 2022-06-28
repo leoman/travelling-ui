@@ -55,6 +55,7 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
 
   const onChange = (value: string | number | Date | boolean, field: string, parent = false) => {
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let newPost: any = {}
     
     if (parent) {
