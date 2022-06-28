@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { Location } from './location'
 import { Photo } from './photo'
 import { Trip } from './trip'
-import { Response } from './index';
 
 export enum Status {
   live = "live",

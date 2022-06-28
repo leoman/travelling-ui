@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FunctionComponent, useState, useEffect } from 'react'
-import { MapI, MapMarkerI } from '../../types'
+import { MapI } from '../../types'
 import { Post } from '../../types/post'
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import { createCustomEqual } from "fast-equals";

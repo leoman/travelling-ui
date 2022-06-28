@@ -3,7 +3,7 @@ import { ContentWrapper } from './styles'
 import ImageLightBox from './ImageLightBox'
 import ImageGallery from './ImageGallery'
 import { Photo } from '../../types/photo'
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     content: string

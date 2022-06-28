@@ -25,9 +25,9 @@ const Create: React.FC = (): React.ReactElement => {
   const navigate = useNavigate()
   const { tripSlug } = useParams<{ tripSlug: string }>();
   const [post, setPost] = useState<Post>(initialState)
-  const [ trips, setTrips ] = useState<undefined | Trip[]>(undefined)
+  // const [ trips, setTrips ] = useState<undefined | Trip[]>(undefined)
   const [ trip, setTrip ] = useState<undefined | Trip>(undefined)
-  const [ error, setError ] = useState<null | string>(null)
+  // const [ error, setError ] = useState<null | string>(null)
 
   const onChange = (post: Post) => setPost(post)
 
@@ -37,12 +37,12 @@ const Create: React.FC = (): React.ReactElement => {
       const trips = response.result;
       const trip = trips.find(trip => trip.slug === tripSlug)
       setTrip(trip);
-      setTrips(trips);
+      // setTrips(trips);
 
-      setError(null);
+      // setError(null);
     } catch (error) {
       console.error(error);
-      setError('Could not fetch trips');
+      // setError('Could not fetch trips');
     }
   }
 
