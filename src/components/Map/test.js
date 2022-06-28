@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-export const createHTMLMapMarker = ({ OverlayView = google.maps.OverlayView, maps = google.maps,  ...args }) => {
+export const createHTMLMapMarker = ({ OverlayView = google.maps.OverlayView,  ...args }) => {
   class HTMLMapMarker extends OverlayView {
     constructor() {
       super();
@@ -18,19 +18,19 @@ export const createHTMLMapMarker = ({ OverlayView = google.maps.OverlayView, map
         this.div.innerHTML = this.html;
       }
 
-      this.div.addEventListener("onmouseenter", () => {
-        console.log('onmouseenter');
-        // map.setCenter(marker.getPosition() as google.maps.LatLng);
-      });
-
-      this.div.addEventListener("onmouseout", () => {
-        console.log('onmouseout');
-        // map.setCenter(marker.getPosition() as google.maps.LatLng);
-      });
-
-      // maps.event.addDomListener(this.div, 'click', event => {
-      //   maps.event.trigger(this, 'click');
+      // this.div.addEventListener("onmouseenter", () => {
+      //   console.log('onmouseenter');
+      //   // map.setCenter(marker.getPosition() as google.maps.LatLng);
       // });
+
+      // this.div.addEventListener("onmouseout", () => {
+      //   console.log('onmouseout');
+      //   // map.setCenter(marker.getPosition() as google.maps.LatLng);
+      // });
+
+      // // maps.event.addDomListener(this.div, 'click', event => {
+      // //   maps.event.trigger(this, 'click');
+      // // });
     }
 
     appendDivToOverlay() {
