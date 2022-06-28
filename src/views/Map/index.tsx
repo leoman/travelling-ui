@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useQuery } from 'react-query'
 import { useNavigate } from "react-router-dom";
 import Map from '../../components/Map';
 import LocationList from '../../components/LocationList';
@@ -29,35 +30,25 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
   const navigate = useNavigate();
   const [ hoveredLocationKey, setHoveredLocationKey ] = useState<null | number>(null)
   const [ fade, setFade ] = useState<boolean>(false)
-  const [ loading, setLoading ] = useState<boolean>(false)
-  const [ error, setError ] = useState<null | string>(null)
-  const [ data, setData ] = useState<Post[]>([])
+  const [ show, setShow ] = useState<boolean>(false)
+  const [ posts, setPosts ] = useState<Post[]>([])
   const [ navigationShown, setNavigationShown ] = useState<boolean>(true)
   
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        setLoading(true);
-        const response = await API.getPosts({ status: 'live', trip: slug });
-        setData(response.result);
-        setError(null);
-      } catch (error) {
-        console.error(error);
-        setError('Bad things happened');
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (slug) {
-      fetchPost();
-    }
-  }, [slug]);
+  const { isLoading: loading, error, data } = useQuery(['getPosts', slug], () => API.getPosts({ status: 'live', trip: slug }), {
+    staleTime: 3600000, 
+  });
 
-  if (!loading) {
-    setTimeout(() => {
-      setFade(true)
-    }, 1000)
-  }
+  useEffect(() => {
+    if (data?.result) {
+      setPosts(data?.result);
+    }
+  }, [data]);
+
+  // if (!loading) {
+  //   setTimeout(() => {
+  //     setFade(true)
+  //   }, 1000)
+  // }
 
   const listItemHovered = (hoveredLocationKey: number): void => setHoveredLocationKey(hoveredLocationKey)
 
@@ -70,7 +61,22 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
 
   const listRef = useRef<HTMLInputElement>(null)
 
-  if (loading || error) return <Loading fade={fade} />;
+  // useEffect(() => {
+  //   if (!loading) {
+  //     setFade(true)
+  //   }
+  //   if (fade && !error) {
+  //     setTimeout(() => setShow(true), 1000)
+  //   }
+  // }, [loading, fade, error])
+
+  useEffect(() => {
+    setFade(false)
+    setShow(false)
+    setTimeout(() => setShow(true), 1000)
+  }, [data])
+
+  if (loading || !show || error) return <Loading fade={fade} />;
 
   return (
       <MapViewWrapper>
@@ -81,7 +87,7 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
           </TitleWrapper>
           <MapWrapper navigationShown={navigationShown}>
               <NavigationToggle onClick={() => toggleNavigation(navigationShown)} />
-              <Map posts={data} hoveredLocationKey={hoveredLocationKey} slug={slug}  />
+              <Map posts={posts} hoveredLocationKey={hoveredLocationKey} slug={slug}  />
           </MapWrapper>
           <ListWrapper navigationShown={navigationShown} ref={listRef}>
             <ScrollTop ref={listRef} light={true} />
@@ -103,7 +109,7 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
                 </FormGroup>
               </FormWrapper>
             </div>
-            <LocationList posts={data} listItemHovered={listItemHovered} />
+            <LocationList posts={posts} listItemHovered={listItemHovered} />
           </ListWrapper>
       </MapViewWrapper>
   )

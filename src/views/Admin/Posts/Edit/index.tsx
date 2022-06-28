@@ -14,61 +14,53 @@ import {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
 } from '@bootstrap-styled/v4'
+import Loading from '../../../../components/Loading';
 import API from '../../../../service/travelingAPI';
 import { Post } from '../../../../types/post'
 import Form from '../Form'
 import { ControlBar } from './styles'
-// import { GET_POST, EDIT_POST, ADD_PHOTO, DELETE_PHOTO } from '../../../../queries'
 import { Photo } from '../../../../types/photo'
 
 const Edit: React.FC = (): React.ReactElement | null => {
 
-  const { id } = useParams<{ id: string }>()
-  const [ post, setPost ] = useState<Post | null>(null)
+  const { tripSlug } = useParams<{ tripSlug: string }>();
+  const { slug } = useParams<{ slug: string }>()
   const [ message, setMessage ] = useState<string>('')
-  // const { loading, error, data } = useQuery(GET_POST, { variables: { id: id } })
-  // const [ editPost ] = useMutation(EDIT_POST)
-  // const [ addPhoto ] = useMutation(ADD_PHOTO, {
-  //   update(cache, { data: { addPhoto } }) {
-  //     const { post } = cache.readQuery({ query: GET_POST, variables: { id: id } })
-  //     cache.writeQuery({
-  //       query: GET_POST,
-  //       data: { post: {
-  //         ...post,
-  //         photos: post.photos.concat([addPhoto])
-  //       } },
-  //     })
-  //   }
-  // })
-  // const [ deletePhoto ] = useMutation(DELETE_PHOTO, {
-  //   update(cache, { data: { deletePhoto } }) {
-  //     const { post } = cache.readQuery({ query: GET_POST, variables: { id: id } })
-  //     cache.writeQuery({
-  //       query: GET_POST,
-  //       data: { post: {
-  //         ...post,
-  //         photos: post.photos.filter((photo: Photo) => photo.id !== deletePhoto.id),
-  //       } },
-  //     })
-  //   }
-  // })
+  const [ loading, setLoading ] = useState<boolean>(false)
+  const [ error, setError ] = useState<null | string>(null)
+  const [ post, setPost ] = useState<null | Post>(null)
 
-  // useEffect(() => {
-  //   if (data && data.post) {
-  //     setPost(data.post)
-  //   }
-  // }, [loading, data])
+  const fetchPost = async () => {
+    if (slug) {
+      try {
+        setLoading(true);
+        const response = await API.getPost(slug);
+        setPost(response.result);
+        setError(null);
+      } catch (error) {
+        console.error(error);
+        setError('Bad things happened');
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchPost();
+  }, [slug]);
 
   const onChange = (post: Post) => setPost(post)
 
   const onSave = async () => {
     if (post && post.id) {
+      console.log('post.order', post.order);
       const editPostVariables: Post = {
         ...post,
         location: {
           ...post.location,
         },
-        order: new Date(Number(post.order))
+        order: new Date(post.order)
       }
 
       try {
@@ -80,19 +72,46 @@ const Edit: React.FC = (): React.ReactElement | null => {
     }
   }
 
-  // const onSaveImage = async (currentPhoto: string) => {
-  //   const response = await addPhoto({ variables: { id, url: currentPhoto } })
+  const onSaveImage = async (currentPhoto: string) => {
+    if (!post || !post.id) return false;
+    try {
+      const response = await API.savePhoto({ postId: post.id, url: currentPhoto });
 
-  //   if(response.data.addPhoto) {
-  //     setMessage('Post has been updated')
-  //     return response
-  //   }
-  //   return false
-  // }
+      if (post.photos) {
+        setPost({
+          ...post,
+          photos: post.photos.concat([{ id: response.result.id, url: currentPhoto}])
+        })
+      }
 
-  // const onDeleteImage = async (id: number) => await deletePhoto({ variables: { id } })
+      setMessage('Post has been updated')
+      return response
+    } catch (error) {
+      setError('An error occurred when saving the photo')
+      console.log(error)
+      return false
+    }
+  }
 
-  // if (loading || error || !post) return null
+  const onDeleteImage = async (id: number) => {
+    try {
+      await API.deletePhoto(id);
+
+      if (post && post.photos) {
+        setPost({
+          ...post,
+          photos: post.photos.filter((photo: Photo) => photo.id !== id),
+        })
+      }
+    } catch (error) {
+      setError('An error occurred when deleting the photo')
+      console.log(error)
+    }
+  }
+
+  if (loading || error || !post) return null
+
+  if (loading || error) return <Loading fade={false} />;
 
   return (
     <Container>
@@ -108,9 +127,11 @@ const Edit: React.FC = (): React.ReactElement | null => {
       <Row>
         <Col>
           {message && <Alert color="success" isOpen={message} uncontrolled autoHideDuration="5000">{message}</Alert>}
+          {error && <Alert color="error" isOpen={error} uncontrolled autoHideDuration="5000">{error}</Alert>}
 
           <Breadcrumb>
-            <BreadcrumbItem><Link to={'/admin/posts'}>Home</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link to={`/admin/trips`}>Home</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link to={`/admin/trips/${tripSlug}/posts`}>{tripSlug} Posts</Link></BreadcrumbItem>
             <BreadcrumbItem active>Edit Post</BreadcrumbItem>
           </Breadcrumb>
 
@@ -118,7 +139,7 @@ const Edit: React.FC = (): React.ReactElement | null => {
             <Button onClick={() => onSave()} outline="true" color="primary">Save Post</Button>
           </ControlBar>
 
-          {/* <Form post={post} onPostChange={onChange} onSaveImage={onSaveImage} onDeleteImage={onDeleteImage} /> */}
+          <Form post={post} onPostChange={onChange} onSaveImage={onSaveImage} onDeleteImage={onDeleteImage} />
         </Col>
       </Row>
     </Container>

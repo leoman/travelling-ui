@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { DateTime } from 'luxon'
 import {
     Container,
     Row,
@@ -23,40 +22,39 @@ import {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
 } from '@bootstrap-styled/v4'
-import { Link, useParams } from "react-router-dom"
+import { Link } from "react-router-dom"
 import API from '../../../../service/travelingAPI';
 import Loading from '../../../../components/Loading';
-import { Table, ControlBar } from './styles'
-import { Post } from '../../../../types/post'
+import { Table, ControlBar } from './styles';
+import { Trip } from '../../../../types/trip';
 
 const ListView: React.FC = (): React.ReactElement => {
 
-  const { tripSlug } = useParams<{ tripSlug: string }>();
   const [modal, setModal] = useState<boolean>(false)
   const [id, setId] = useState<number | null>(null)
   const [ loading, setLoading ] = useState<boolean>(false)
   const [ error, setError ] = useState<null | string>(null)
-  const [ data, setData ] = useState<Post[]>([])
+  const [ trips, setTrips ] = useState<Trip[]>([])
 
-  const fetchPosts = async () => {
+  const fetchTrips = async () => {
     try {
       setLoading(true);
-      const response = await API.getPosts({ trip: tripSlug });
-      setData(response.result);
+      const response = await API.getTrips({});
+      setTrips(response.result);
       setError(null);
     } catch (error) {
       console.error(error);
-      setError('Bad things happened');
+      setError('No trips could be fetched');
     } finally {
       setLoading(false);
     }
   }
 
+  
+
   useEffect(() => {
-    if (tripSlug) {
-      fetchPosts();
-    }
-  }, [tripSlug]);
+    fetchTrips();
+  }, []);
 
 
   const showDeleteModal = (id?: number): void => {
@@ -73,8 +71,8 @@ const ListView: React.FC = (): React.ReactElement => {
 
   const onDelete = async (id: number) => {
     try {
-      await API.deletePost(id);
-      await fetchPosts();
+      await API.deleteTrip(id);
+      await fetchTrips();
     } catch (error) {
       console.error(error);
       setError('Delete failed');
@@ -88,22 +86,22 @@ const ListView: React.FC = (): React.ReactElement => {
     closeDeleteModal()
   }
 
-  if (loading || error) return <Loading fade={false} />;
+  if (loading || error) return (<Loading fade={false} />);
 
   return (
     <Container>
       <Row>
         <Col lg="12">
         <Jumbotron>
-          <H1 className="display-4">Admin: Posts</H1>
-          <P lead>Please use the list below to administer changes to Posts.</P>
+          <H1 className="display-4">Admin: Trips</H1>
+          <P lead>Please use the list below to administer changes to Trips.</P>
           <Hr className="my-4" />
         </Jumbotron>
         </Col>
       </Row>
 
       <Modal isOpen={modal} toggle={() => closeDeleteModal()}>
-        <ModalHeader toggle={() => closeDeleteModal()}>Delete Post</ModalHeader>
+        <ModalHeader toggle={() => closeDeleteModal()}>Delete Trip</ModalHeader>
         <ModalBody>
           This action cannot be un done.
         </ModalBody>
@@ -117,14 +115,12 @@ const ListView: React.FC = (): React.ReactElement => {
         <Col lg="12">
 
           <Breadcrumb>
-            <BreadcrumbItem><Link to={`/admin/trips`}>Home</Link></BreadcrumbItem>
-            <BreadcrumbItem>{tripSlug}</BreadcrumbItem>
-            <BreadcrumbItem active>View Posts</BreadcrumbItem>
+            <BreadcrumbItem to={`/admin/trips`} active>Home</BreadcrumbItem> 
           </Breadcrumb>
 
           <ControlBar>
-            <Link to={`/admin/trips/${tripSlug}/posts/add`}>
-              <Button outline="true" color="primary">Add Post</Button>
+            <Link to={`/admin/trips/add`}>
+              <Button outline="true" color="primary">Add Trip</Button>
             </Link>
           </ControlBar>
         </Col>
@@ -148,18 +144,12 @@ const ListView: React.FC = (): React.ReactElement => {
               </Tr>
             </Thead>
             <Tbody>
-              {data.map(({ id, slug, title, order, status }: Post, i: number) => (
+              {trips.map(({ id, slug, name, status }: Trip, i: number) => (
                 <Tr key={i.toString()}>
-                  <Td>{title}</Td>
+                  <Td><Link to={`/admin/trips/${slug}/posts`}>{name}</Link></Td>
                   <Td>{status}</Td>
-                  <Td>{DateTime.fromJSDate(new Date(order)).toFormat("dd MMMM y")}</Td>
                   <Td>
-                    <Link to={`/admin/trips/${tripSlug}/posts/preview/${slug}`}>
-                      <Button outline="true" color="primary">Preview</Button>
-                    </Link>
-                  </Td>
-                  <Td>
-                    <Link to={`/admin/trips/${tripSlug}/posts/edit/${slug}`}>
+                    <Link to={`/admin/trips/edit/${id}`}>
                       <Button outline="true" color="primary">Edit</Button>
                     </Link>
                   </Td>

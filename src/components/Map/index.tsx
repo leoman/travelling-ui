@@ -100,16 +100,10 @@ interface MapProps extends google.maps.MapOptions {
 }
 
 const MapFC: React.FC<MapProps> = ({ children, bounds, posts, style, ...options}) => {
-
-
-  useEffect(() => {
-    // console.log('Map options', options);
-  }, [options])
-
   const ref = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = React.useState<google.maps.Map>();
 
-  const setFlightPath = (map: google.maps.Map, projection: google.maps.MapCanvasProjection) => {
+  const setFlightPath = (map: google.maps.Map) => {
 
     const lineSymbol = {
       path: 'M 0,-1 0,1',
@@ -144,8 +138,7 @@ const MapFC: React.FC<MapProps> = ({ children, bounds, posts, style, ...options}
     Overlay.draw = function () { return }
     
     Overlay.onAdd = function () {
-      const projection = this.getProjection()
-      setFlightPath(map, projection)
+      setFlightPath(map)
     }
   }
 
@@ -183,11 +176,13 @@ const MapFC: React.FC<MapProps> = ({ children, bounds, posts, style, ...options}
 
 export const Map: FunctionComponent<MapI> = ({ posts, hoveredLocationKey, slug }: MapI): React.ReactElement | null => {
 
+  const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || '';
+
   let defaultCenter = {
     lat: 49.54580194929472,
     lng: 14.065185524286113,
   }
-  const [zoom] = React.useState(posts.length > 0 ? 3 : 3);
+  const [zoom] = React.useState(posts.length > 0 ? null : 3);
 
   if (posts.length > 0) {
     defaultCenter = {
@@ -198,6 +193,16 @@ export const Map: FunctionComponent<MapI> = ({ posts, hoveredLocationKey, slug }
 
   const [bounds, setBounds] = React.useState<google.maps.LatLngBounds>(new google.maps.LatLngBounds());
   const [center, setCenter] = React.useState<google.maps.LatLngLiteral>(defaultCenter);
+
+  const getDefaultMapBounds = () => {
+    const bounds = new google.maps.LatLngBounds()	  
+    bounds.extend(new google.maps.LatLng(	
+      defaultCenter.lat,	
+      defaultCenter.lng,	
+    ))	
+
+    return bounds	
+  }
 
   const getMapBounds = () => {
     const bounds = new google.maps.LatLngBounds()	  
@@ -213,18 +218,21 @@ export const Map: FunctionComponent<MapI> = ({ posts, hoveredLocationKey, slug }
   }
 
   useEffect(() => {
-    const currentBounds = getMapBounds();
-    const centerInfo = currentBounds.getCenter();
+    const currentBounds = getDefaultMapBounds();
     setBounds(currentBounds);
-    setCenter({ lat: centerInfo.lat(), lng: centerInfo.lng()})
-  }, [slug, posts]);
+  }, []);
 
   useEffect(() => {
-    console.log(zoom);
-  }, [zoom]);
+    if (posts.length > 0) {
+      const currentBounds = getMapBounds();
+      const centerInfo = currentBounds.getCenter();
+      setBounds(currentBounds);
+      setCenter({ lat: centerInfo.lat(), lng: centerInfo.lng()})
+    }
+  }, [slug, posts]);
 
   return (
-    <Wrapper apiKey={"AIzaSyBAo4ixGPFTjKHDEc9t-E0yGrYfK5BN6y4"} render={render}>
+    <Wrapper apiKey={GOOGLE_MAP_KEY} render={render}>
       <MapFC
         center={center}
         zoom={zoom}

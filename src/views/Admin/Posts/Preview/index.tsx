@@ -16,8 +16,6 @@ import { Post } from '../../../../types/post'
 
 
 const PostView: React.FC = (): React.ReactElement | null => {
-
-  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
 
   const [ loading, setLoading ] = useState<boolean>(false)
@@ -46,7 +44,7 @@ const PostView: React.FC = (): React.ReactElement | null => {
 
   const backToPosts = () => {
     if (post) {
-      navigate(`/admin/posts?trip=${post.trip.slug}`, { replace: false })
+      window.location.replace(`${origin}/admin/trips/${post.trip.slug}/posts`);
     }
   }
 

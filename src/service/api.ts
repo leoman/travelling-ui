@@ -12,8 +12,9 @@ export interface Param {
 }
 export interface Params { [key: string]: string | boolean | undefined }
 
-export const BASE_URL = 'http://localhost:4003/dev';
 export const EMPTY_PARAMS = '';
+
+export const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://jvqqdjqgu5.execute-api.eu-west-2.amazonaws.com/prod' : 'http://localhost:4003/dev'
 
 class API {
 

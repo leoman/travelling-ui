@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-// import moment from 'moment'
+import { DateTime } from 'luxon'
+import { Response } from '../../../../types'
 import { Post } from '../../../../types/post'
 import { Photo } from '../../../../types/photo'
-// import Editor from '../../../../components/Editor'
+import Editor from '../../../../components/Editor'
 import { MarkDownEditor, PostImagesContainer, PostPhotosShow, PhotoHeader, PostImage } from './styles'
 import {
     Form as FormWrapper,
@@ -24,8 +25,8 @@ import {
 interface Props {
     post: Post
     onPostChange(post: Post): void
-    onSaveImage?(photo: string): Promise<any>
-    onDeleteImage?(id: number): Promise<any>
+    onSaveImage?(photo: string): Promise<Response<Photo> | false>
+    onDeleteImage?(id: number): Promise<void>
 }
 
 export enum Fields {
@@ -52,36 +53,36 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
   const [idToDelete, setIdToDelete] = useState<number | null>(null)
   const [modal, setModal] = useState<boolean>(false)
 
-  // const onChange = (value, field: string, parent = false) => {
+  const onChange = (value: string | number | Date | boolean, field: string, parent = false) => {
 
-  //   let newPost: any = {}
+    let newPost: any = {}
     
-  //   if (parent) {
-  //     newPost = {
-  //       ...post,
-  //       location: {
-  //         ...post.location,
-  //         [field]: value
-  //       }
-  //     }
-  //   } else {
-  //     newPost = {
-  //       ...post,
-  //       [field]: value
-  //     }
-  //   }
+    if (parent) {
+      newPost = {
+        ...post,
+        location: {
+          ...post.location,
+          [field]: value
+        }
+      }
+    } else {
+      newPost = {
+        ...post,
+        [field]: value
+      }
+    }
 
-  //   const updatedPost: Post = newPost
+    const updatedPost: Post = newPost
 
-  //   setPost(updatedPost)
-  //   onPostChange(updatedPost)
-  // }
+    setPost(updatedPost)
+    onPostChange(updatedPost)
+  }
 
   const onPhotoUpdate = (value: string): void => {
     setCurrentPhoto(value)
   }
 
-  const onAddphoto = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+  const onAddPhoto = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     e.preventDefault()
       
     if (onSaveImage) {
@@ -96,15 +97,17 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
     }
   }
 
-  // const renderAddPostImage = (): React.ReactFragment => (
-  //   <>
-  //     <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => onAddphoto(e)}>Add </button>
-  //     <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onPhotoUpdate(e.currentTarget.value)} value={currentPhoto} type="text" className="form-control" />
-  //   </>
-  // )
+  const renderAddPostImage = () => (
+    <>
+      <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => onAddPhoto(e)}>Add </button>
+      <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onPhotoUpdate(e.currentTarget.value)} value={currentPhoto} type="text" className="form-control" />
+    </>
+  )
 
-  const showDeleteModal = (id: number): void => {
-    setIdToDelete(id)
+  const showDeleteModal = (id?: number): void => {
+    if (id) {
+      setIdToDelete(id)
+    }
     setModal(true)
   }
 
@@ -114,12 +117,15 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
   }
 
   const confirmDelete = () => {
-    // onPhotoDelete(idToDelete)
+    if (idToDelete) {
+      onPhotoDelete(idToDelete)
+    }
     closeDeleteModal()
   }
 
   const renderPostImages = () => {
     const { photos } = post
+    console.log(post);
     if (photos && photos.length) {
       return (
         <div>
@@ -138,9 +144,9 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
       
           <PostPhotosShow showPhotos={showPhotos}>
             <PostImagesContainer>
-              {/* {photos.map((photo: Photo, i) => (
+              {photos.map((photo: Photo, i) => (
                 <li onClick={() => showDeleteModal(photo.id)} key={i}><PostImage src={photo.url} /></li>
-              ))} */}
+              ))}
             </PostImagesContainer>
           </PostPhotosShow>
         </div>
@@ -148,21 +154,16 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
     }
   }
 
-  const onChangeLat = (value: string) => {
-    // if (value !== '') {
-    //   onChange(parseFloat(value), 'lat', true)
-    // } else {
-    //   onChange(value, 'lat', true)
-    // }
+  const onChangeLatLng = (value: string, type: string) => {
+    if (value !== '') {
+      onChange(parseFloat(value), type, true)
+    } else {
+      onChange(value, type, true)
+    }
   }
 
-  const onChangeLng = (value: string) => {
-    // if (value !== '') {
-    //   onChange(parseFloat(value), 'lng', true)
-    // } else {
-    //   onChange(value, 'lng', true)
-    // }
-  }
+  const onChangeLat = (value: string) => onChangeLatLng(value, 'lat')
+  const onChangeLng = (value: string) => onChangeLatLng(value, 'lng')
 
   const { id, title, slug, titleColour, content, photo, status, order, location: { location, duration, lat, lng, hideFromBounding } } = formPost
 
@@ -171,7 +172,7 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Title</InputGroupAddon>
-          {/* <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'title')} value={title} type="text" className="form-control" /> */}
+          <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'title')} value={title} type="text" className="form-control" />
         </InputGroup>
       </FormGroup>
       <FormGroup>
@@ -183,31 +184,31 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Title Colour</InputGroupAddon>
-          {/* <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'titleColour')} value={titleColour} type="text" className="form-control" /> */}
+          <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'titleColour')} value={titleColour} type="text" className="form-control" />
         </InputGroup>
       </FormGroup>
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Main Photo</InputGroupAddon>
-          {/* <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'photo')} value={photo} type="text" className="form-control" /> */}
+          <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'photo')} value={photo} type="text" className="form-control" />
         </InputGroup>
       </FormGroup>
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Location</InputGroupAddon>
-          {/* <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'location', true)} value={location} type="text" className="form-control" /> */}
+          <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(e.currentTarget.value, 'location', true)} value={location} type="text" className="form-control" />
         </InputGroup>
       </FormGroup>
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Order (dsc by date)</InputGroupAddon>
-          {/* <input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(new Date(e.currentTarget.value), 'order')} value={moment(Number(order)).format('yyyy-MM-DD')} type="date" className="date-time" /> */}
+          <input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(new Date(e.currentTarget.value), 'order')} value={DateTime.fromJSDate(new Date(order)).toFormat("y-MM-dd")} type="date" className="date-time" />
         </InputGroup>
       </FormGroup>
       <FormGroup>
         <InputGroup>
           <InputGroupAddon>Duration</InputGroupAddon>
-          {/* <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(Number(e.currentTarget.value), 'duration', true)} value={duration} type="text" className="form-control" /> */}
+          <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChange(Number(e.currentTarget.value), 'duration', true)} value={duration} type="text" className="form-control" />
       
           <InputGroupAddon>Lat</InputGroupAddon>
           <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChangeLat(e.currentTarget.value)} value={lat} type="number" className="form-control" />
@@ -216,20 +217,20 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
           <Input onChange={(e: React.FormEvent<HTMLInputElement>) => onChangeLng(e.currentTarget.value)} value={lng} type="number" className="form-control" />
       
           <InputGroupAddon>Status</InputGroupAddon>
-          {/* <Select value={status} onChange={(e: React.FormEvent<HTMLSelectElement>) => onChange(e.currentTarget.value, 'status')} >
+          <Select value={status} onChange={(e: React.FormEvent<HTMLSelectElement>) => onChange(e.currentTarget.value, 'status')} >
             <Option value="draft">Draft</Option>
             <Option value="live">Live</Option>
-          </Select> */}
+          </Select>
 
           <InputGroupAddon>Hide</InputGroupAddon>
-          {/* <Input onChange={() => onChange(!hideFromBounding, 'hideFromBounding', true)} value={hideFromBounding} checked={hideFromBounding} type="checkbox" className="form-control" />{' '} */}
+          <Input onChange={() => onChange(!hideFromBounding, 'hideFromBounding', true)} value={hideFromBounding} checked={hideFromBounding} type="checkbox" className="form-control" />{' '}
         </InputGroup>
       </FormGroup>
       {id && (
         <FormGroup>
           <InputGroup>
             <InputGroupAddon>Images</InputGroupAddon>
-            {/* {renderAddPostImage()} */}
+            {renderAddPostImage()}
           </InputGroup>
           {renderPostImages()}
         </FormGroup>
@@ -238,7 +239,7 @@ const Form: React.FC<Props> = ({ post, onPostChange, onSaveImage, onDeleteImage 
         <InputGroup>
           <InputGroupAddon>Content</InputGroupAddon>
           <MarkDownEditor>
-            {/* <Editor onChange={(value: string) => onChange(value, 'content')} value={content} /> */}
+            <Editor onChange={(value: string) => onChange(value, 'content')} value={content} />
           </MarkDownEditor>
         </InputGroup>
       </FormGroup>

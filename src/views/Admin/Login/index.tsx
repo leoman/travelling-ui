@@ -30,7 +30,7 @@ const Login: React.FC = () => {
     try {
       const response = await API.login({ username, password });
       localStorage.setItem('token', response.result.token)
-      navigate("/admin/posts", { replace: false });
+      navigate("/admin/trips", { replace: true });
     } catch(error) {
       setMessage('Your login credentials were incorrect')
     }

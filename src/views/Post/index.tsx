@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query'
 import { useParams } from "react-router-dom";
 import ScrollProgress from '../../components/ScrollProgress';
 import ScrollTop from '../../components/ScrollTop';
@@ -25,28 +26,19 @@ const PostView: React.FC = () => {
   const [ fade, setFade ] = useState<boolean>(false)
   const [ show, setShow ] = useState<boolean>(false)
   const { slug } = useParams<{ slug: string }>();
-  const [ loading, setLoading ] = useState<boolean>(false)
-  const [ error, setError ] = useState<null | string>(null)
   const [ post, setPost ] = useState<null | Post>(null)
 
+  if (!slug) return null;
+
+  const { isLoading: loading, error, data } = useQuery(['getPost', slug], () => API.getPost(slug), {
+    staleTime: 3600000, 
+  });
+
   useEffect(() => {
-    const fetchPost = async () => {
-      if (slug) {
-        try {
-          setLoading(true);
-          const response = await API.getPost(slug);
-          setPost(response.result);
-          setError(null);
-        } catch (error) {
-          console.error(error);
-          setError('Bad things happened');
-        } finally {
-          setLoading(false);
-        }
-      }
+    if (data?.result) {
+      setPost(data?.result);
     }
-    fetchPost();
-  }, [slug]);
+  }, [data]);
 
   useEffect(() => {
     if (!loading) {
