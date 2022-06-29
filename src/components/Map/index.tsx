@@ -43,8 +43,8 @@ function useDeepCompareEffectForMaps(
   React.useEffect(callback, dependencies.map(useDeepCompareMemoize));
 }
 
-const render = (status: Status) => {
-  return <h1>{status}</h1>;
+const render = () => {
+  return <h1></h1>;
 };
 
 interface MarkerProps extends google.maps.MarkerOptions {
@@ -233,7 +233,7 @@ export const Map: FunctionComponent<MapI> = ({ posts, hoveredLocationKey, slug }
   }, [slug, posts]);
 
   return (
-    <Wrapper apiKey={GOOGLE_MAP_KEY} render={render}>
+    <Wrapper apiKey={'AIzaSyAPRFsDApyws3fqycIL34P2q1CqOlfZBJU'} render={render}>
       <MapFC
         center={center}
         zoom={zoom}
