@@ -2,7 +2,7 @@
 import React, { FunctionComponent, useState, useEffect } from 'react'
 import { MapI } from '../../types'
 import { Post } from '../../types/post'
-import { Wrapper, Status } from "@googlemaps/react-wrapper";
+import { Wrapper } from "@googlemaps/react-wrapper";
 import { createCustomEqual } from "fast-equals";
 import { isLatLngLiteral } from "@googlemaps/typescript-guards";
 import { createHTMLMapMarker } from './test';
@@ -233,7 +233,7 @@ export const Map: FunctionComponent<MapI> = ({ posts, hoveredLocationKey, slug }
   }, [slug, posts]);
 
   return (
-    <Wrapper apiKey={'AIzaSyAPRFsDApyws3fqycIL34P2q1CqOlfZBJU'} render={render}>
+    <Wrapper apiKey={GOOGLE_MAP_KEY} render={render}>
       <MapFC
         center={center}
         zoom={zoom}
