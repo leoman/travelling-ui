@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom"
 import {
   Card,
   CardText,
-   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
 } from '@bootstrap-styled/v4'
 import API from '../../../../service/travelingAPI';
 import Loading from '../../../../components/Loading'

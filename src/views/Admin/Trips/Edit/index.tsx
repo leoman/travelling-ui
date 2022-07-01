@@ -11,8 +11,6 @@ import {
     BreadcrumbItem,
     Button,
     Alert,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
 } from '@bootstrap-styled/v4'
 import Loading from '../../../../components/Loading';
 import API from '../../../../service/travelingAPI';

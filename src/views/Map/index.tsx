@@ -4,20 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Map from '../../components/Map';
 import LocationList from '../../components/LocationList';
 import Loading from '../../components/Loading'
+import TripSelection from '../../components/TripSelection'
 import { Post } from '../../types/post'
 import { Trip } from '../../types/trip'
 import API from '../../service/travelingAPI';
 import { MapViewWrapper, MapWrapper, ListWrapper, NavigationToggle, TitleWrapper, Title } from './styles';
-import {
-  Form as FormWrapper,
-  FormGroup,
-  Input,
-  Option,
-  InputGroupAddon,
-  InputGroup,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-} from '@bootstrap-styled/v4'
 import ScrollTop from '../../components/ScrollTop';
 
 interface Props {
@@ -44,12 +35,6 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
     }
   }, [data]);
 
-  // if (!loading) {
-  //   setTimeout(() => {
-  //     setFade(true)
-  //   }, 1000)
-  // }
-
   const listItemHovered = (hoveredLocationKey: number): void => setHoveredLocationKey(hoveredLocationKey)
 
   const toggleNavigation = (navigationShown: boolean): void => setNavigationShown(!navigationShown)
@@ -60,15 +45,6 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
   }
 
   const listRef = useRef<HTMLInputElement>(null)
-
-  // useEffect(() => {
-  //   if (!loading) {
-  //     setFade(true)
-  //   }
-  //   if (fade && !error) {
-  //     setTimeout(() => setShow(true), 1000)
-  //   }
-  // }, [loading, fade, error])
 
   useEffect(() => {
     setFade(false)
@@ -94,21 +70,7 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
             <Title navigation>
                 Kirsty and Pete&apos;s Travel Adventure
             </Title>
-            <div style={{ width: '50%', margin: '0 auto' }}>
-              <FormWrapper>
-                <FormGroup>
-                  <InputGroup>
-                    <InputGroupAddon>Our Trips:</InputGroupAddon>
-                    <Input onChange={changeTrip} type="select" name="trips" id="trips" value={slug}>
-                      <Option key={'default'} value={''}>Please select a trip</Option>
-                      {trips.map((trip) => (
-                        <Option key={trip.slug} value={trip.slug}>{trip.name}</Option>
-                      ))}
-                    </Input>
-                  </InputGroup>
-                </FormGroup>
-              </FormWrapper>
-            </div>
+            <TripSelection changeTrip={changeTrip} trips={trips} slug={slug} />
             <LocationList posts={posts} listItemHovered={listItemHovered} />
           </ListWrapper>
       </MapViewWrapper>

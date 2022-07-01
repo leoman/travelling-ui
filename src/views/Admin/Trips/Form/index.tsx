@@ -8,8 +8,6 @@ import {
     Input,
     Select,
     Option,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
 } from '@bootstrap-styled/v4'
 
 interface Props {

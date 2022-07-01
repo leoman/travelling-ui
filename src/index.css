@@ -9,13 +9,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.map-marker-wrapper {
-  /* position: absolute;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  pointer-events: all;
-  z-index: 1000000; */
-}
+.map-marker-wrapper {}
 
 .map-marker {
   position: absolute;

@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import {
     Table as StyledTable,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
 } from '@bootstrap-styled/v4';
 
 export const Table = styled(StyledTable)`
