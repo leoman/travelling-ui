@@ -49,7 +49,7 @@ const MapView: React.FC<Props> = ({ slug, trips }) => {
   useEffect(() => {
     setFade(false)
     setShow(false)
-    setTimeout(() => setShow(true), 1000)
+    setTimeout(() => setShow(true), 500)
   }, [data])
 
   if (loading || !show || error) return <Loading fade={fade} />;

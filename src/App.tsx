@@ -40,7 +40,7 @@ const App = () => {
       setFade(true)
     }
     if (fade && !error) {
-      setTimeout(() => setShow(true), 1000)
+      setTimeout(() => setShow(true), 500)
     }
   }, [isLoading, fade, error])
 
